@@ -1,60 +1,56 @@
-const babel = require('rollup-plugin-babel');
-const { terser } = require('rollup-plugin-terser');
-const pkg = require('./package.json');
+import terser from '@rollup/plugin-terser';
+import { readFileSync } from 'fs';
 
-const input = 'src/index.js';
+const { homepage, name, version, module } = JSON.parse(readFileSync('./package.json'));
+
+
 const banner = `/*!
- * chartjs-gauge.js v${pkg.version}
- * ${pkg.homepage}
- * (c) ${new Date().getFullYear()} chartjs-gauge.js Contributors
- * Released under the MIT License
+ * @license
+ * ${name}
+ * ${homepage}
+ * Version: ${version}
+ *
+ * Copyright ${new Date().getFullYear()} Chart.js Contributors
+ * Released under the MIT license
+ * https://github.com/thienvu18/chartjs-gauge/blob/master/LICENSE.md
  */`;
 
-module.exports = [
-  // UMD builds (excluding Chart)
-  // dist/chartjs-gauge.js
-  // dist/chartjs-gauge.min.js
+export default [
   {
-    input,
-    plugins: [
-      babel({
-        exclude: 'node_modules/**',
-      }),
-    ],
-    output: {
-      name: 'Gauge',
-      file: 'dist/chartjs-gauge.js',
-      banner,
-      format: 'umd',
-      indent: false,
-      globals: {
-        'chart.js': 'Chart',
-      },
-    },
+    input: 'src/index.js',
+    output: ['dist', 'docs'].flatMap(folder => ['js', 'min.js'].map((suffix) => {
+      const config = {
+        name: 'Chart.Gauge',
+        file: `${folder}/${name}.${suffix}`,
+        banner: banner,
+        format: 'umd',
+        indent: false,
+        plugins: [],
+        globals: {
+          'chart.js': 'Chart',
+        },
+      };
+
+      if (suffix.match(/\.min\.js$/)) {
+        config.plugins.push(
+          terser(),
+        );
+      }
+
+      return config;
+    }), []),
+    plugins: [],
     external: [
       'chart.js',
     ],
   },
   {
-    input,
-    plugins: [
-      babel({
-        exclude: 'node_modules/**',
-      }),
-      terser({
-        output: {
-          preamble: banner,
-        },
-      }),
-    ],
+    input: 'src/index.esm.js',
     output: {
-      name: 'Gauge',
-      file: 'dist/chartjs-gauge.min.js',
-      format: 'umd',
+      file: module,
+      banner: banner,
+      format: 'esm',
       indent: false,
-      globals: {
-        'chart.js': 'Chart',
-      },
     },
     external: [
       'chart.js',
