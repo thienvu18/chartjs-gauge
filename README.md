@@ -1,4 +1,4 @@
-# ![chartjs-gauge logo](./samples/logo.svg) chartjs-gauge (Chart.js v4+)
+# ![chartjs-gauge logo](./logo.svg) chartjs-gauge (Chart.js v4+)
 
 A simple, customizable **gauge chart** for [Chart.js](https://www.chartjs.org/), now compatible with **Chart.js v4+**.
 
